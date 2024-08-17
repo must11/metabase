@@ -54,7 +54,8 @@
    [metabase.plugins.classloader :as classloader]
    [metabase.util.i18n :refer [deferred-tru]]
    [ring.middleware.content-type :as content-type]
-   [ring.util.response :as response]))
+   [ring.util.response :as response]
+   [metabase.extend.excel-upload :as excel-upload]))
 
 (when config/ee-available?
   (classloader/require 'metabase-enterprise.api.routes))
@@ -149,4 +150,5 @@
   (context "/user"                 [] (+auth api.user/routes))
   (context "/api-key"              [] (+auth api.api-key/routes))
   (context "/util"                 [] api.util/routes)
+  (context "/extend"               [] excel-upload/routes)
   (route/not-found (constantly {:status 404, :body (deferred-tru "API endpoint does not exist.")})))

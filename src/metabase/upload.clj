@@ -36,6 +36,7 @@
    [metabase.util.i18n :refer [tru]]
    [metabase.util.malli :as mu]
    [metabase.util.malli.schema :as ms]
+    [metabase.util.log :as log]
    [toucan2.core :as t2])
   (:import
    (java.io File)
@@ -72,9 +73,11 @@
   [driver raw-name]
   (if (str/blank? raw-name)
     "unnamed_column"
-    (u/slugify (str/trim raw-name)
-               ;; since slugified names contain only ASCII characters, we can conflate bytes and length here.
-               {:max-length (max-column-bytes driver)})))
+    (str/trim raw-name)                                     ;表头不编码，
+    ;(u/slugify (str/trim raw-name)
+    ;           ;; since slugified names contain only ASCII characters, we can conflate bytes and length here.
+    ;           {:max-length (max-column-bytes driver)})
+    ))
 
 (def auto-pk-column-name
   "The lower-case name of the auto-incrementing PK column. The actual name in the database could be in upper-case."
@@ -241,7 +244,7 @@
    (reduce max 0 data-row-column-counts)
    header-column-count])
 
-(def ^:private allowed-extensions #{nil "csv" "tsv" "txt"})
+(def ^:private allowed-extensions #{nil "csv" "tsv" "txt","xlsx"})
 
 (def ^:private allowed-mime-types #{"text/csv" "text/tab-separated-values" "text/plain"})
 
@@ -311,6 +314,7 @@
             [header & rows]   (cond-> (parse reader)
                                 auto-pk?
                                 without-auto-pk-columns)
+
             settings          (upload-parsing/get-settings)
             column-names      (derive-column-names driver header)
             cols->upload-type (detect-schema settings column-names rows)
@@ -320,6 +324,8 @@
             csv-col-names     (keys cols->upload-type)
             col-upload-types  (vals cols->upload-type)
             parsed-rows       (vec (parse-rows settings col-upload-types rows))]
+        (log/info "csv header" header "\n" "colunm-name " column-names )
+
         (driver/create-table! driver
                               (:id db)
                               table-name
@@ -506,7 +512,7 @@
     (collection/check-write-perms-for-collection collection-id)
     (try
       (let [timer             (u/start-timer)
-            filename-prefix   (or (second (re-matches #"(.*)\.(csv|tsv)$" filename))
+            filename-prefix   (or (second (re-matches #"(.*)\.(csv|tsv|xlsx)$" filename))
                                   filename)
             humanized-name    (humanization/name->human-readable-name filename-prefix)
             display-name      (u/truncate-string-to-byte-count humanized-name (max-bytes :model/Table :display_name))
