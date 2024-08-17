@@ -85,6 +85,7 @@
          (finally (io/delete-file file :silently ))))
 
 (defn- suffix-to-csv [filename]
+
       (clojure.string/replace  filename #"\.[^.]+$" ".csv"))
 
 (defn- from-excel!
