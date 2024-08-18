@@ -184,7 +184,7 @@
   stencil/stencil                           {:mvn/version "0.5.0"}              ; Mustache templates for Clojure
   user-agent/user-agent                     {:mvn/version "0.1.1"}              ; User-Agent string parser, for Login History page & elsewhere
   weavejester/dependency                    {:mvn/version "0.2.1"}              ; Dependency graphs and topological sorting
-  com.github.must11/excel2csv               {:local/root "/home/tt/meta/excel2csv/0.0.1-SNAPSHOT/excel2csv-0.0.1-SNAPSHOT.jar"}
+  com.github.must11/excel2csv               {:local/root "javaclass/excel2csv/0.0.1-SNAPSHOT/excel2csv-0.0.1-SNAPSHOT.jar"}
 
   }
 
