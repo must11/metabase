@@ -14,7 +14,7 @@ import type { Dispatch, State } from "metabase-types/store";
 import type { FileUploadState } from "metabase-types/store/upload";
 import { UploadMode } from "metabase-types/store/upload";
 
-export const UPLOAD_DATA_FILE_TYPES = [".csv", ".tsv"];
+export const UPLOAD_DATA_FILE_TYPES = [".csv", ".tsv",".xlsx"];
 
 export const UPLOAD_FILE_TO_COLLECTION = "metabase/collection/UPLOAD_FILE";
 export const UPLOAD_FILE_START = "metabase/collection/UPLOAD_FILE_START";
@@ -24,8 +24,8 @@ export const UPLOAD_FILE_CLEAR = "metabase/collection/UPLOAD_FILE_CLEAR";
 export const UPLOAD_FILE_CLEAR_ALL =
   "metabase/collection/UPLOAD_FILE_CLEAR_ALL";
 
-const MAX_UPLOAD_SIZE = 50 * 1024 * 1024;
-export const MAX_UPLOAD_STRING = "50";
+const MAX_UPLOAD_SIZE = 50 * 1024 * 1024*10;
+export const MAX_UPLOAD_STRING = "500";
 
 const CLEAR_AFTER_MS = 8000;
 
@@ -100,6 +100,9 @@ export const uploadFile = createThunkAction(
               return MetabaseApi.tableReplaceCSV({ tableId, formData });
             case UploadMode.create:
             default:
+              if (file.name.split('.').pop() =="xlsx") {
+                return CardApi.uploadExcel({formData})
+                }
               return CardApi.uploadCSV({ formData });
           }
         })();

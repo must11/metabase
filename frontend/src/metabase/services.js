@@ -141,6 +141,10 @@ export const CardApi = {
     formData: true,
     fetch: true,
   }),
+    uploadExcel: POST("/api/extend/from-excel", {
+      formData: true,
+      fetch: true,
+    }),
   get: GET("/api/card/:cardId"),
   update: PUT("/api/card/:id"),
   delete: DELETE("/api/card/:id"),
