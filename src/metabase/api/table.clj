@@ -28,6 +28,7 @@
    [metabase.util.log :as log]
    [metabase.util.malli :as mu]
    [metabase.util.malli.schema :as ms]
+    [metabase.extend.excel-upload :as excel-upload]
    [toucan2.core :as t2]))
 
 (set! *warn-on-reflection* true)
@@ -607,18 +608,22 @@
   "Inserts the rows of an uploaded CSV file into the table identified by `:id`. The table must have been created by uploading a CSV file."
   [id :as {raw-params :params}]
   {id ms/PositiveInt}
-  (update-csv! {:table-id id
-                :filename (get-in raw-params ["file" :filename])
-                :file     (get-in raw-params ["file" :tempfile])
-                :action   ::upload/append}))
+   (let [option (excel-upload/help-excel-to-csv  (get-in raw-params ["file" :filename]) (get-in raw-params ["file" :tempfile]  ))]
+                      (update-csv! {:table-id id
+                                    :filename (:filename option )
+                                    :file     (:file option )
+                                    :action   ::upload/append}))
+                 )
 
 (api/defendpoint ^:multipart POST "/:id/replace-csv"
   "Replaces the contents of the table identified by `:id` with the rows of an uploaded CSV file. The table must have been created by uploading a CSV file."
   [id :as {raw-params :params}]
   {id ms/PositiveInt}
-  (update-csv! {:table-id id
-                :filename (get-in raw-params ["file" :filename])
-                :file     (get-in raw-params ["file" :tempfile])
-                :action   ::upload/replace}))
+                 (let [option (excel-upload/help-excel-to-csv  (get-in raw-params ["file" :filename]) (get-in raw-params ["file" :tempfile]  ))]
+                      (update-csv! {:table-id id
+                                    :filename (:filename option )
+                                    :file     (:file option )
+                                    :action   ::upload/replace}))
+                 )
 
 (api/define-routes)
